@@ -13,7 +13,7 @@ def main():
     # 提示: text.lower()
     # 在这里写你的代码：
     text=text.lower()
-    print(text)
+    
 
     # TODO 2: 去掉标点和换行，只保留字母和空格
     # 提示: 用 for 循环遍历每个字符，只留下 c.isalpha() 或 c.isspace() 的字符
@@ -23,24 +23,38 @@ def main():
     for c in text:
         if c.isalpha()or c.isspace():
             new_s+=c
-    print(new_s)
+    
 
 
     # TODO 3: 按空格切分成单词列表
     # 提示: .split()
     # 在这里写你的代码：
+    words = new_s.split()
+    
 
     # TODO 4: 用 dict 统计每个单词出现次数
     # 提示: 遍历列表，if word in counts: counts[word] += 1
     #                       else: counts[word] = 1
     # 在这里写你的代码：
+    counts = {}
+    for c in words:
+        if c in counts: 
+            counts [c] += 1
+        else: counts [c] = 1
+    
+
+
 
     # TODO 5: 按次数从高到低排序，取前 10 个
     # 提示: sorted(counts.items(), key=lambda x: x[1], reverse=True)[:10]
     # 在这里写你的代码：
+    top10 = sorted(counts.items(), key=lambda x: x[1], reverse=True)[:10]
+   
 
     # TODO 6: 打印，格式：单词 : 次数
     # 在这里写你的代码：
+    for word, count in top10:
+        print(f"{word} : {count}")
 
 
 if __name__ == "__main__":
