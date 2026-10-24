@@ -16,5 +16,4 @@ resp = client.chat.completions.create(
         {"role": "user", "content": "用一句话解释什么是人工智能"}
     ],
 )
-
 print(resp.choices[0].message.content)
