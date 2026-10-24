@@ -45,3 +45,11 @@ Python 语法速览，写给有 C 基础的人。包含 12 个最小片段：变
 ```bash
 python practice.py
 ```
+## llm_utils.py
+封装了大模型调用的工具函数 `ask()`，供其他脚本复用。
+
+## hello_llm.py
+第一个大模型调用程序。
+
+## translate.py
+中译英工具，通过 system prompt 约束输出格式。

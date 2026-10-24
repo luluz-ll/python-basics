@@ -1,0 +1,9 @@
+import os 
+from llm_utils import ask
+
+files = os.listdir("notes")
+path = os.path.join("notes", "ai_basics.txt")
+with open(path,"r",encoding="utf_8") as f:
+    content=f.read()
+summary = ask(content, "你是文章总结助手。用一句话概括核心观点，不超过 40 字")
+print(summary)
