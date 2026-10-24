@@ -12,6 +12,7 @@ client = OpenAI(
 resp = client.chat.completions.create(
     model="glm-5.3-flash",
     messages=[
+        {"role": "system", "content": "你是一个严格的、会指出错误的老教授"},
         {"role": "user", "content": "用一句话解释什么是人工智能"}
     ],
 )

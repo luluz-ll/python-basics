@@ -36,11 +36,13 @@ def main():
     # 提示: 遍历列表，if word in counts: counts[word] += 1
     #                       else: counts[word] = 1
     # 在这里写你的代码：
-    counts = {}
+    count = {}
     for c in words:
-        if c in counts: 
-            counts [c] += 1
-        else: counts [c] = 1
+        if c in count:
+            count[c] += 1
+        else:
+            count[c] = 1
+        
     
 
 
@@ -48,7 +50,7 @@ def main():
     # TODO 5: 按次数从高到低排序，取前 10 个
     # 提示: sorted(counts.items(), key=lambda x: x[1], reverse=True)[:10]
     # 在这里写你的代码：
-    top10 = sorted(counts.items(), key=lambda x: x[1], reverse=True)[:10]
+    top10 = sorted(count.items(), key=lambda x: x[1], reverse=True)[:10]
    
 
     # TODO 6: 打印，格式：单词 : 次数
