@@ -327,10 +327,132 @@ from llm_utils import ask
 
 ---
 
-## 十三、待学 / 待补
+## 十三、RAG 与 embedding
 
-- [ ] `join` 的具体输出（今天错过一次）
+### 完整链路
+
+```
+读文件 → 切块 → 算向量 → 存索引 → 检索 → 喂 prompt → 回答
+           检索 Retrieval    增强 Augmented    生成 Generation
+```
+
+### 算向量（embedding）
+
+```python
+r = client.embeddings.create(model="embedding-3", input="文本")
+vec = r.data[0].embedding      # 2048 个浮点数
+```
+
+**意思相近的文字，向量也相近。**
+
+### 余弦相似度
+
+```python
+import numpy as np
+
+def cos(a, b):
+    return float(a @ b / (np.linalg.norm(a) * np.linalg.norm(b)))
+```
+
+| 分数 | 含义 |
+|---|---|
+| ≈ 1.0 | 意思几乎一样 |
+| 0.6 - 0.8 | 明显相关 |
+| 0.4 - 0.6 | 弱相关 |
+| ≈ 0 | 无关 |
+
+`a @ b` = 点积；`np.linalg.norm(a)` = 向量长度。除以长度 = 只看方向，不看长短。
+
+### 建索引 + 存文件
+
+```python
+chunks = materials.split("\n\n")
+
+r = client.embeddings.create(model="embedding-3", input=chunks)
+vectors = [d.embedding for d in r.data]
+
+with open("embeddings.json", "w", encoding="utf-8") as f:
+    json.dump({"chunks": chunks, "vectors": vectors}, f, ensure_ascii=False)
+```
+
+> 批量 `input=chunks` 不支持时，改成 for 循环一个个传。
+> 加了新文件必须重跑，索引不会自动更新。
+
+### 检索
+
+```python
+with open("embeddings.json", "r", encoding="utf-8") as f:
+    d = json.load(f)
+chunks = d["chunks"]
+vectors = [np.array(v) for v in d["vectors"]]
+
+qv = np.array(client.embeddings.create(
+    model="embedding-3", input=问题).data[0].embedding)
+
+scored = [(cos(qv, v), i) for i, v in enumerate(vectors)]
+scored.sort(reverse=True)
+
+top = scored[:3]                              # [(分数, 下标), ...]
+context = "\n\n".join([chunks[i] for s, i in top])
+```
+
+### 两种检索对比
+
+| 方式 | 原理 | 缺点 |
+|---|---|---|
+| n-gram 关键词 | 字面重合 | **换个说法就找不到** |
+| **embedding 向量** | 语义相似 | 要先算向量、占空间 |
+
+**实测：问「大模型是怎么训练的」，块1（讲训练过程的）在关键词检索里排第 5（被 top_k=3 漏掉），在向量检索里排第 2。**
+
+**结论：RAG 的效果 80% 取决于检索，不是模型。**
+
+---
+
+## 十四、快速回忆表
+
+| 想干什么 | 写法 |
+|---|---|
+| 从大到小排序 | `sorted(x, reverse=True)` |
+| 多行字符串嵌变量 | `f"""...{x}..."""` |
+| 缓存函数结果 | `@st.cache_data` 写在 `def` 上一行 |
+| 单行输入框 | `text = st.text_input("提示")` |
+| 按钮 | `if st.button("文字"):` |
+| 折叠面板 | `with st.expander("标题"):` |
+| 跨重跑保存 | `st.session_state.键 = 值` |
+| 存索引 | `json.dump(数据, f, ensure_ascii=False)` |
+| 读索引 | `json.load(f)` |
+| 转成数组 | `np.array(列表)` |
+| 点积 | `a @ b` |
+| 向量长度 | `np.linalg.norm(a)` |
+
+### 运行命令（最容易忘）
+
+| 文件里有 `import streamlit`？ | 命令 |
+|---|---|
+| 没有 | `python 文件名.py` |
+| **有** | **`streamlit run 文件名.py`** |
+
+**看到 `missing ScriptRunContext` → 就是用了 `python` 跑 Streamlit。**
+
+### 环境变量排错
+
+```
+配置明明对了却不生效
+  → 检查系统环境变量有没有覆盖 .env
+  → [Environment]::GetEnvironmentVariable("变量名","User")
+  → load_dotenv(override=True)   # 让 .env 说了算
+  → 改完必须重启进程
+```
+
+---
+
+## 十五、待学 / 待补
+
+- [x] RAG：切块 + 检索
+- [x] embedding 与向量检索
+- [ ] `join` 的具体输出
 - [ ] `return` vs `print` 的深入理解
-- [ ] RAG：切块 + 检索
-- [ ] embedding 与向量检索
-- [ ] 部署 Streamlit 到公网（注意额度！）
+- [ ] 部署 Streamlit 到公网（注意额度和密钥安全）
+- [ ] 索引增量更新（加文件后自动重建）
+- [ ] 用 `st.file_uploader` 让用户自己上传文档
