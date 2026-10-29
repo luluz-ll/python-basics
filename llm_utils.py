@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
+load_dotenv(override=True)
 client=OpenAI(
     api_key=os.environ["ZHIPU_API_KEY"],
     base_url="https://open.bigmodel.cn/api/paas/v4/",
