@@ -10,7 +10,7 @@
 | 文件类型 | 命令 |
 |---|---|
 | 普通 Python 脚本 | `python 文件名.py` |
-| **Streamlit 网页** | **`streamlit run app.py`** |
+| **Streamlit 网页** | **`streamlit run rag_app.py`** |
 | 停止 Streamlit | `Ctrl + C` |
 
 > ⚠️ `python app.py` 只会执行代码，不会启动网页服务器。
