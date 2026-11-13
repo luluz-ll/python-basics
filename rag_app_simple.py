@@ -8,6 +8,7 @@ from llm_utils import client, ask
 
 # ---------- 1. 加载预建索引 ----------
 @st.cache_data
+
 def load_index():
     with open("embeddings.json", "r", encoding="utf-8") as f:
         d = json.load(f)
